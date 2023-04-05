@@ -11,7 +11,7 @@
     position: absolute;
     width: calc(100% - 20px);
     max-width: 800px;
-    height: 500px;
+    height: 600px;
     border-radius: 10px;
     background-color: #fff;
     left: 50%;
@@ -60,7 +60,7 @@
     list-style: none;
     padding: 20px 10px 0 10px;
     margin: 0;
-    height: 347px;
+    height: 395px;
     overflow: scroll;
   }
   .messages .message {

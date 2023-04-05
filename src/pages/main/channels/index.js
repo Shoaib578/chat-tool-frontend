@@ -28,6 +28,7 @@ export default class Channels extends React.Component {
         Axios.post("http://localhost:5000/apis/channel/add_channel",formData)
         .then(res=>{
             if(res.data.is_created){
+                this.get_all_channels()
                 alert("Channel created")
             }else{
                 alert("Something went wrong")

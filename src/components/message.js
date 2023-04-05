@@ -7,7 +7,10 @@ export default function Message(props){
     const [want_to_reply,setWanttoReply] = useState(false)
     const [reply_message,setReplyMessage]= useState("")
     const [all_replies,setReplies] = useState([])
-    const [TempRelies,setTempReplies]= useState([])
+    const [is_liked,setIsLiked] = useState(false)
+    const [is_disliked,setIsDisLiked] = useState(false)
+
+   
     
     const reply = ()=>{
         socket.emit('reply',{
@@ -21,7 +24,7 @@ export default function Message(props){
     }
 
     const get_all_replies = ()=>{
-        Axios.get("http://localhost:5000/apis/message/get_messages?channel_id="+parseInt(window.location.pathname.split("/")[2]))
+        Axios.get(`http://localhost:5000/apis/message/get_messages?user_id=${props.user_id}&&channel_id=${parseInt(window.location.pathname.split("/")[2])}`)
         .then(res=>{
              let temp_replies = []
             if(res.data.replies.length>0){
@@ -52,7 +55,67 @@ export default function Message(props){
             setReplies(temp_replies)
         }
     }
+    
 
+    const Like = ()=>{
+       
+        if(is_liked){
+            setIsLiked(false)
+        }else{
+            if(is_disliked){
+                setIsDisLiked(false)
+            }
+            setIsLiked(true)
+
+        }
+
+        socket.emit('like',{
+            "message_id":props.data.message_id,
+            "user_id":props.user_id,
+            "action":is_liked?0:1
+
+        })
+    }
+
+    const DisLike = ()=>{
+        
+        if(is_disliked){
+            
+            setIsDisLiked(false)
+        }else{
+            if(is_liked){
+                setIsLiked(false)
+            }
+            setIsDisLiked(true)
+
+        }
+
+        socket.emit('dislike',{
+            "message_id":props.data.message_id,
+            "user_id":props.user_id,
+            "action":is_disliked?0:1
+
+        })
+        
+    }
+
+    const check_liked_or_disliked = ()=>{
+       
+        if(props.data.liked == 1){
+            setIsLiked(true)
+        }else{
+            setIsLiked(false)
+
+        }
+
+
+        if(props.data.disliked == 1){
+            setIsDisLiked(true)
+        }else{
+            setIsDisLiked(false)
+
+        }
+    }
   
 
 
@@ -67,6 +130,7 @@ export default function Message(props){
     },[socket])
 
     useEffect(()=>{
+        check_liked_or_disliked()
         get_filtered_props_replies()
     },[])
    
@@ -81,7 +145,16 @@ export default function Message(props){
       <div className="text mt-3" >
            &nbsp;{props.data.message}
         </div>
+
+        <div style={{float:'right',marginTop:5}}>
+        <i class="fa fa-thumbs-up" onClick={Like} style={{fontSize:20,marginRight:10,color:is_liked?'blue':'black'}}>({props.data.num_likes})</i>
+        <i class="fa fa-thumbs-down" onClick={DisLike} style={{fontSize:20,color:is_disliked?'blue':'black'}}>({props.data.num_dislikes})</i>
+        </div>
+        
+
         <br />
+        <br />
+
         
         {all_replies.map((reply,index)=>{
             return  <div key={index} style={{backgroundColor:"white",marginTop:3}}>
